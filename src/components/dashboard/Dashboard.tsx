@@ -16,11 +16,13 @@ import {
   FileText,
   Clock,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  MessageCircle
 } from "lucide-react";
 import DiagnosisUpload from "./DiagnosisUpload";
 import DiagnosisHistory from "./DiagnosisHistory";
 import DoctorReview from "./DoctorReview";
+import HealthAssistant from "./HealthAssistant";
 
 const Dashboard = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState("upload");
@@ -79,6 +81,16 @@ const Dashboard = ({ user, onLogout }) => {
               <History className="w-4 h-4 mr-2" />
               {isDoctor ? "审核历史" : "诊断历史"}
             </Button>
+            {!isDoctor && (
+              <Button
+                variant={activeTab === "assistant" ? "default" : "ghost"}
+                className="w-full justify-start"
+                onClick={() => setActiveTab("assistant")}
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                健康助手
+              </Button>
+            )}
             {isDoctor && (
               <Button
                 variant={activeTab === "patients" ? "default" : "ghost"}
@@ -171,6 +183,7 @@ const Dashboard = ({ user, onLogout }) => {
               isDoctor ? <DoctorReview /> : <DiagnosisUpload />
             )}
             {activeTab === "history" && <DiagnosisHistory isDoctor={isDoctor} />}
+            {activeTab === "assistant" && !isDoctor && <HealthAssistant />}
             {activeTab === "patients" && isDoctor && (
               <Card>
                 <CardHeader>

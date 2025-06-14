@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -168,7 +167,7 @@ const RegisterForm = ({ onRegister }) => {
             <Checkbox 
               id="agree" 
               checked={agreed}
-              onCheckedChange={setAgreed}
+              onCheckedChange={(checked) => setAgreed(checked === true)}
             />
             <Label htmlFor="agree" className="text-sm">
               我同意 <Button variant="link" className="p-0 h-auto text-sm">服务条款</Button> 和 
