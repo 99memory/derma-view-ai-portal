@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   LogOut, 
   Upload, 
@@ -12,7 +12,6 @@ import {
   Users, 
   Settings, 
   Bell,
-  Camera,
   FileText,
   Clock,
   CheckCircle,
@@ -24,10 +23,19 @@ import DiagnosisHistory from "./DiagnosisHistory";
 import DoctorReview from "./DoctorReview";
 import HealthAssistant from "./HealthAssistant";
 
-const Dashboard = ({ user, onLogout }) => {
+const Dashboard = () => {
+  const { profile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState("upload");
 
-  const isDoctor = user.role === "doctor";
+  const isDoctor = profile?.role === "doctor";
+
+  const handleLogout = async () => {
+    await signOut();
+  };
+
+  if (!profile) {
+    return <div>加载中...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -47,12 +55,12 @@ const Dashboard = ({ user, onLogout }) => {
             </Button>
             <div className="flex items-center space-x-2">
               <Avatar>
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback>{user.name[0]}</AvatarFallback>
+                <AvatarImage src={profile.avatar_url} />
+                <AvatarFallback>{profile.name[0]}</AvatarFallback>
               </Avatar>
-              <span className="font-medium">{user.name}</span>
+              <span className="font-medium">{profile.name}</span>
             </div>
-            <Button variant="outline" size="sm" onClick={onLogout}>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" />
               退出
             </Button>

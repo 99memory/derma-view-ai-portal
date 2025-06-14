@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,69 +6,43 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Mail, Lock, User, Stethoscope } from "lucide-react";
 
-const RegisterForm = ({ onRegister }) => {
+const RegisterForm = () => {
+  const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
-    role: "patient"
+    role: "patient" as 'patient' | 'doctor'
   });
   const [isLoading, setIsLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "密码不匹配",
-        description: "请确认两次输入的密码相同",
-        variant: "destructive"
-      });
       return;
     }
 
     if (!agreed) {
-      toast({
-        title: "请同意服务条款",
-        description: "您需要同意我们的服务条款才能注册",
-        variant: "destructive"
-      });
       return;
     }
 
     setIsLoading(true);
-
-    // 模拟注册过程
-    setTimeout(() => {
-      const userData = {
-        id: Date.now(),
-        email: formData.email,
-        name: formData.name,
-        role: formData.role,
-        avatar: "/api/placeholder/40/40"
-      };
-
-      toast({
-        title: "注册成功",
-        description: `欢迎加入，${userData.name}！`,
-      });
-
-      onRegister(userData);
-      setIsLoading(false);
-    }, 1000);
+    await signUp(formData.email, formData.password, formData.name, formData.role);
+    setIsLoading(false);
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-lg">
+    <Card className="w-full shadow-lg">
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl font-bold">创建账户</CardTitle>
         <CardDescription>
@@ -110,7 +85,7 @@ const RegisterForm = ({ onRegister }) => {
 
           <div className="space-y-2">
             <Label htmlFor="role">账户类型</Label>
-            <Select value={formData.role} onValueChange={(value) => handleInputChange("role", value)}>
+            <Select value={formData.role} onValueChange={(value: 'patient' | 'doctor') => handleInputChange("role", value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
