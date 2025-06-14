@@ -39,7 +39,7 @@ export const diagnosisService = {
         .select()
         .single();
 
-      return { data, error };
+      return { data: data as DiagnosisRecord, error };
     } catch (error) {
       return { data: null, error };
     }
@@ -52,7 +52,7 @@ export const diagnosisService = {
       .select('*')
       .order('created_at', { ascending: false });
 
-    return { data: data || [], error };
+    return { data: (data as DiagnosisRecord[]) || [], error };
   },
 
   // 医生获取待审核的诊断
@@ -66,7 +66,7 @@ export const diagnosisService = {
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
-    return { data: data || [], error };
+    return { data: (data as DiagnosisRecord[]) || [], error };
   },
 
   // 医生更新诊断结果
@@ -89,7 +89,7 @@ export const diagnosisService = {
       .select()
       .single();
 
-    return { data, error };
+    return { data: data as DiagnosisRecord, error };
   },
 
   // AI诊断接口 - 预留给您的模型

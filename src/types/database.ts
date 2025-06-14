@@ -2,7 +2,7 @@
 export interface Profile {
   id: string;
   name: string;
-  role: 'patient' | 'doctor';
+  role: string; // Changed from union type to string to match Supabase
   avatar_url?: string;
   created_at: string;
   updated_at: string;
@@ -15,8 +15,8 @@ export interface DiagnosisRecord {
   symptoms?: string;
   ai_diagnosis?: string;
   ai_confidence?: number;
-  risk_level?: '低风险' | '中风险' | '高风险';
-  status: 'pending' | 'reviewed' | 'completed';
+  risk_level?: string; // Changed from union type to string to match Supabase
+  status: string; // Changed from union type to string to match Supabase
   doctor_id?: string;
   doctor_diagnosis?: string;
   doctor_notes?: string;

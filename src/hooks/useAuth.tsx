@@ -38,7 +38,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .select('*')
               .eq('id', session.user.id)
               .single();
-            setProfile(profileData);
+            
+            if (profileData) {
+              // Type assertion to ensure compatibility
+              setProfile(profileData as Profile);
+            }
           }, 0);
         } else {
           setProfile(null);

@@ -5,36 +5,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "@/hooks/use-toast";
-import { Mail, Lock, User } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
-const LoginForm = ({ onLogin }) => {
+const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // 模拟登录过程
-    setTimeout(() => {
-      const userData = {
-        id: 1,
-        email,
-        name: email.split("@")[0],
-        role: email.includes("doctor") ? "doctor" : "patient",
-        avatar: "/api/placeholder/40/40"
-      };
-
-      toast({
-        title: "登录成功",
-        description: `欢迎回来，${userData.name}！`,
-      });
-
-      onLogin(userData);
-      setIsLoading(false);
-    }, 1000);
+    await signIn(email, password);
+    setIsLoading(false);
   };
 
   return (
