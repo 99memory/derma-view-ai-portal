@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (session?.user) {
           // Fetch user profile
-          setTimeout(async () => {
+          try {
             const { data: profileData } = await supabase
               .from('profiles')
               .select('*')
@@ -40,10 +40,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .single();
             
             if (profileData) {
-              // Type assertion to ensure compatibility
               setProfile(profileData as Profile);
             }
-          }, 0);
+          } catch (error) {
+            console.error('Error fetching profile:', error);
+          }
         } else {
           setProfile(null);
         }
@@ -55,7 +56,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
+      
+      if (session?.user) {
+        // Fetch user profile for existing session
+        const fetchProfile = async () => {
+          try {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (profileData) {
+              setProfile(profileData as Profile);
+            }
+          } catch (error) {
+            console.error('Error fetching existing session profile:', error);
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchProfile();
+      } else {
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
