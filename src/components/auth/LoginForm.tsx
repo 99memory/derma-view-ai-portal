@@ -18,7 +18,12 @@ const LoginForm = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    await signIn(email, password);
+    const { error } = await signIn(email, password);
+    if (!error) {
+      // 登录成功，清空表单
+      setEmail("");
+      setPassword("");
+    }
     setIsLoading(false);
   };
 
