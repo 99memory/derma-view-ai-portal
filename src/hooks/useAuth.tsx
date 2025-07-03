@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
-              .single();
+              .maybeSingle();
             
             if (mounted && profileData) {
               setProfile(profileData as Profile);
@@ -63,26 +63,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return;
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          try {
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-            
-            if (mounted && profileData) {
-              setProfile(profileData as Profile);
+          // Fetch profile data asynchronously without blocking
+          setTimeout(async () => {
+            try {
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .maybeSingle();
+              
+              if (mounted && profileData) {
+                setProfile(profileData as Profile);
+              }
+            } catch (error) {
+              console.error('Error fetching profile on auth change:', error);
             }
-          } catch (error) {
-            console.error('Error fetching profile on auth change:', error);
-          }
+          }, 0);
         } else {
           setProfile(null);
         }
