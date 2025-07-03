@@ -27,9 +27,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     let mounted = true;
 
     const initializeAuth = async () => {
+      console.log('正在初始化身份验证...');
       try {
         // Get current session
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('获取到的会话:', session);
         
         if (!mounted) return;
         
@@ -37,13 +39,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('正在获取用户配置文件...');
           // Try to fetch profile
           try {
-            const { data: profileData } = await supabase
+            const { data: profileData, error } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
               .maybeSingle();
+            
+            console.log('配置文件数据:', profileData, '错误:', error);
             
             if (mounted && profileData) {
               setProfile(profileData as Profile);
@@ -56,6 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Error initializing auth:', error);
       } finally {
         if (mounted) {
+          console.log('身份验证初始化完成，设置 loading 为 false');
           setLoading(false);
         }
       }
