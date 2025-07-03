@@ -57,8 +57,22 @@ const HealthAssistant = () => {
   const generateAIResponse = (userInput: string): string => {
     const input = userInput.toLowerCase();
     
-    if (input.includes("皮肤") || input.includes("痘痘") || input.includes("痤疮")) {
-      return "关于皮肤问题，建议您：\n\n1. 保持面部清洁，每天用温和的洁面产品清洗\n2. 避免用手触摸脸部\n3. 保持充足的睡眠和均衡饮食\n4. 如果症状持续或加重，建议咨询专业皮肤科医生\n\n您也可以通过我们的AI诊断功能上传皮肤照片进行初步评估。";
+    if (input.includes("皮肤") || input.includes("痘痘") || input.includes("痤疮") || input.includes("诊断") || input.includes("黑色素") || input.includes("色斑")) {
+      return `病变特征：您左前臂外侧的色素斑块近两个月快速增大、颜色不均、边缘不规则，并伴有脱屑、溃破及少量出血，符合黑色素瘤（恶性皮肤癌）常见的"ABCD"特征（Asymmetry 不对称、Border irregularity 边缘不规则、Color variation 色彩多样、Diameter 直径增大）。
+
+疼痛与渗出：近期出现刺痛、灼热感及反复渗出，提示病灶可能已侵犯真皮层或出现炎症、溃疡。
+
+淋巴结肿大：左腋下触及压痛性扁平淋巴结，需警惕淋巴结转移可能性。
+
+家族史与紫外线暴露：母亲既往黑色素瘤病史以及您多年来户外日晒未作充分防护，都是重要的高危因素。
+
+建议的检查与评估：
+皮肤镜（Dermoscopy）检查 - 无创观察病灶内的色素网络、点状出血、蓝白结构等特征，进一步判断恶性可能性。
+
+病理活检（活检或切除术） - 建议对病灶进行全切边缘带少量正常皮肤的外科切除或切片活检，以确定组织学类型和浸润深度（Breslow 厚度）。
+
+--------------------
+上述内容由皮肤健康AI生成，具体举措请联系相关医生`;
     }
     
     if (input.includes("饮食") || input.includes("营养")) {
