@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { diagnosisService } from "@/services/diagnosisService";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Upload, 
   Camera, 
@@ -93,10 +94,18 @@ const DiagnosisUpload = () => {
       
       // 更新记录的AI诊断结果
       if (data) {
-        await diagnosisService.updateDiagnosis(data.id, {
-          doctor_diagnosis: mockResult.diagnosis,
-          doctor_notes: `AI置信度: ${mockResult.confidence}%, 风险等级: ${mockResult.riskLevel}`
-        });
+        const { error: updateError } = await supabase
+          .from('diagnosis_records')
+          .update({
+            ai_diagnosis: mockResult.diagnosis,
+            ai_confidence: mockResult.confidence,
+            risk_level: mockResult.riskLevel
+          })
+          .eq('id', data.id);
+        
+        if (updateError) {
+          console.error('更新AI诊断结果失败:', updateError);
+        }
       }
 
       toast({

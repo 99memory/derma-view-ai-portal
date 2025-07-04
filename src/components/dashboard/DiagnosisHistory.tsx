@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { diagnosisService } from "@/services/diagnosisService";
 import { DiagnosisRecord } from "@/types/database";
+import { toast } from "@/hooks/use-toast";
 import { 
   Calendar, 
   Search, 
@@ -139,7 +140,7 @@ const DiagnosisHistory = ({ isDoctor }) => {
                         <div className="space-y-2">
                           <div>
                             <span className="text-gray-600">AI置信度:</span>
-                            <span className="ml-2 font-medium">{record.ai_confidence?.toFixed(1) || 0}%</span>
+                            <span className="ml-2 font-medium">{record.ai_confidence ? record.ai_confidence.toFixed(1) + '%' : '待分析'}</span>
                           </div>
                           <div>
                             <span className="text-gray-600">图片数量:</span>
@@ -153,7 +154,7 @@ const DiagnosisHistory = ({ isDoctor }) => {
                           )}
                         </div>
                         
-                        {record.doctor_notes && (
+                        {record.doctor_notes && record.doctor_notes.trim() !== '' && (
                           <div className="space-y-2">
                             <div className="text-gray-600">医生备注:</div>
                             <div className="text-sm bg-blue-50 p-3 rounded-lg border border-blue-200">
@@ -165,7 +166,17 @@ const DiagnosisHistory = ({ isDoctor }) => {
                     </div>
 
                     <div className="flex items-center space-x-2 ml-4">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          // TODO: 实现查看详情功能
+                          toast({
+                            title: "查看详情",
+                            description: "详情页面开发中，敬请期待",
+                          });
+                        }}
+                      >
                         <Eye className="w-4 h-4 mr-1" />
                         查看详情
                       </Button>
