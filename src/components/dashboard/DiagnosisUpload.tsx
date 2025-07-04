@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import { diagnosisService } from "@/services/diagnosisService";
 import { 
   Upload, 
   Camera, 
@@ -84,10 +85,32 @@ const DiagnosisUpload = () => {
     setAnalysisResult(mockResult);
     setIsAnalyzing(false);
 
-    toast({
-      title: "AI分析完成",
-      description: "分析结果已生成，建议医生进一步确认",
-    });
+    // 保存诊断记录到数据库
+    try {
+      const { data, error } = await diagnosisService.createDiagnosis([selectedFile], symptoms);
+      
+      if (error) throw error;
+      
+      // 更新记录的AI诊断结果
+      if (data) {
+        await diagnosisService.updateDiagnosis(data.id, {
+          doctor_diagnosis: mockResult.diagnosis,
+          doctor_notes: `AI置信度: ${mockResult.confidence}%, 风险等级: ${mockResult.riskLevel}`
+        });
+      }
+
+      toast({
+        title: "AI分析完成",
+        description: "分析结果已生成并保存，建议医生进一步确认",
+      });
+    } catch (error) {
+      console.error("保存诊断记录失败:", error);
+      toast({
+        title: "AI分析完成",
+        description: "分析结果已生成，但保存失败。建议医生进一步确认",
+        variant: "destructive"
+      });
+    }
   };
 
   const getRiskBadgeColor = (level) => {

@@ -1,9 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { diagnosisService } from "@/services/diagnosisService";
+import { DiagnosisRecord } from "@/types/database";
 import { 
   Calendar, 
   Search, 
@@ -17,67 +19,66 @@ import {
 
 const DiagnosisHistory = ({ isDoctor }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [historyRecords, setHistoryRecords] = useState<DiagnosisRecord[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 模拟历史数据
-  const mockHistory = [
-    {
-      id: 1,
-      date: "2024-01-15",
-      patientName: isDoctor ? "张三" : null,
-      diagnosis: "良性色素痣",
-      aiConfidence: 92.5,
-      status: "已确认",
-      riskLevel: "低风险",
-      doctorNotes: "建议定期观察，6个月后复查",
-      images: 1
-    },
-    {
-      id: 2,
-      date: "2024-01-10", 
-      patientName: isDoctor ? "李四" : null,
-      diagnosis: "脂溢性角化病",
-      aiConfidence: 88.3,
-      status: "待复诊",
-      riskLevel: "低风险",
-      doctorNotes: "",
-      images: 2
-    },
-    {
-      id: 3,
-      date: "2024-01-05",
-      patientName: isDoctor ? "王五" : null,
-      diagnosis: "基底细胞癌可能",
-      aiConfidence: 76.8,
-      status: "需要进一步检查",
-      riskLevel: "高风险",
-      doctorNotes: "建议立即到皮肤科就诊，进行活检确诊",
-      images: 3
-    }
-  ];
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const { data: records } = await diagnosisService.getUserDiagnoses();
+        setHistoryRecords(records);
+      } catch (error) {
+        console.error("获取诊断历史失败:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const getStatusBadge = (status) => {
+    fetchHistory();
+  }, []);
+
+  const getStatusText = (status: string) => {
     switch (status) {
-      case "已确认":
-        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />已确认</Badge>;
-      case "待复诊":
-        return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3 mr-1" />待复诊</Badge>;
-      case "需要进一步检查":
-        return <Badge className="bg-red-100 text-red-800"><AlertTriangle className="w-3 h-3 mr-1" />需检查</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
+      case "pending": return "待复诊";
+      case "reviewed": return "已确认";
+      case "completed": return "已完成";
+      default: return status;
     }
   };
 
-  const getRiskBadge = (level) => {
+  const getRiskText = (riskLevel: string) => {
+    switch (riskLevel) {
+      case "低风险": return "低风险";
+      case "中风险": return "中风险";
+      case "高风险": return "高风险";
+      default: return riskLevel || "未知";
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusText = getStatusText(status);
+    switch (status) {
+      case "reviewed":
+      case "completed":
+        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />{statusText}</Badge>;
+      case "pending":
+        return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3 mr-1" />{statusText}</Badge>;
+      default:
+        return <Badge variant="secondary">{statusText}</Badge>;
+    }
+  };
+
+  const getRiskBadge = (level: string) => {
+    const riskText = getRiskText(level);
     switch (level) {
       case "低风险":
-        return <Badge className="bg-green-100 text-green-800">低风险</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{riskText}</Badge>;
       case "中风险":
-        return <Badge className="bg-yellow-100 text-yellow-800">中风险</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{riskText}</Badge>;
       case "高风险":
-        return <Badge className="bg-red-100 text-red-800">高风险</Badge>;
+        return <Badge className="bg-red-100 text-red-800">{riskText}</Badge>;
       default:
-        return <Badge variant="secondary">{level}</Badge>;
+        return <Badge variant="secondary">{riskText}</Badge>;
     }
   };
 
@@ -111,46 +112,52 @@ const DiagnosisHistory = ({ isDoctor }) => {
           </div>
 
           {/* History List */}
-          <div className="space-y-4">
-            {mockHistory.map((record) => (
-              <Card key={record.id} className="border border-gray-200">
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600">加载中...</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {historyRecords.map((record) => (
+                <Card key={record.id} className="border border-gray-200">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <h3 className="font-medium text-lg">{record.diagnosis}</h3>
+                          <h3 className="font-medium text-lg">{record.ai_diagnosis || "AI诊断中"}</h3>
                           {getStatusBadge(record.status)}
-                          {getRiskBadge(record.riskLevel)}
+                          {getRiskBadge(record.risk_level || "")}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {record.date}
+                          {new Date(record.created_at).toLocaleDateString()}
                         </div>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4 text-sm">
                         <div className="space-y-2">
-                          {isDoctor && (
-                            <div>
-                              <span className="text-gray-600">患者:</span>
-                              <span className="ml-2 font-medium">{record.patientName}</span>
-                            </div>
-                          )}
                           <div>
                             <span className="text-gray-600">AI置信度:</span>
-                            <span className="ml-2 font-medium">{record.aiConfidence}%</span>
+                            <span className="ml-2 font-medium">{record.ai_confidence?.toFixed(1) || 0}%</span>
                           </div>
                           <div>
                             <span className="text-gray-600">图片数量:</span>
-                            <span className="ml-2">{record.images} 张</span>
+                            <span className="ml-2">{record.image_urls?.length || 0} 张</span>
                           </div>
+                          {record.symptoms && (
+                            <div>
+                              <span className="text-gray-600">症状:</span>
+                              <span className="ml-2">{record.symptoms}</span>
+                            </div>
+                          )}
                         </div>
                         
-                        {record.doctorNotes && (
+                        {record.doctor_notes && (
                           <div className="space-y-2">
                             <div className="text-gray-600">医生备注:</div>
                             <div className="text-sm bg-blue-50 p-3 rounded-lg border border-blue-200">
-                              {record.doctorNotes}
+                              {record.doctor_notes}
                             </div>
                           </div>
                         )}
@@ -170,11 +177,12 @@ const DiagnosisHistory = ({ isDoctor }) => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Empty State */}
-          {mockHistory.length === 0 && (
+          {!loading && historyRecords.length === 0 && (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Calendar className="w-8 h-8 text-gray-400" />
