@@ -62,8 +62,29 @@ const DiagnosisUpload = () => {
       setProgress(step.progress);
     }
 
-    // 模拟分析结果
-    const mockResult = {
+    // 根据症状描述判断AI分析结果
+    const hasDetailedSymptoms = symptoms && symptoms.length > 20;
+    
+    const mockResult = hasDetailedSymptoms ? {
+      diagnosis: "疑似黑色素瘤",
+      confidence: 89.3,
+      riskLevel: "高风险",
+      riskColor: "red",
+      details: [
+        "病变形态不规则，边界模糊",
+        "色素分布不均匀，存在多种颜色",
+        "病变直径较大，超过6mm",
+        "表面粗糙，存在不对称性",
+        "结合症状描述，具有恶性特征"
+      ],
+      recommendations: [
+        "立即咨询专业医生进行进一步检查",
+        "建议进行皮肤镜检查或活检",
+        "避免延误治疗时机",
+        "密切观察病变变化"
+      ],
+      needsDoctorReview: true
+    } : {
       diagnosis: "良性色素痣",
       confidence: 92.5,
       riskLevel: "低风险",
