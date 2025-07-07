@@ -80,7 +80,7 @@ const LoginForm = () => {
             {isLoading ? "登录中..." : "登录"}
           </Button>
           <div className="text-center text-sm text-gray-500">
-            示例账户: patient@example.com 或 doctor@example.com
+            示例账户: 3290871380@qq.com (测试账户)
           </div>
         </form>
       </CardContent>
