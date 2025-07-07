@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { diagnosisService } from "@/services/diagnosisService";
+import { DiagnosisRecord } from "@/types/database";
 import { 
   CheckCircle, 
   XCircle, 
@@ -19,68 +21,53 @@ import {
 } from "lucide-react";
 
 const DoctorReview = () => {
-  const [selectedCase, setSelectedCase] = useState(null);
+  const [selectedCase, setSelectedCase] = useState<DiagnosisRecord | null>(null);
   const [reviewNotes, setReviewNotes] = useState("");
   const [finalDiagnosis, setFinalDiagnosis] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingCases, setPendingCases] = useState<DiagnosisRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 模拟待审核病例
-  const pendingCases = [
-    {
-      id: 1,
-      patientName: "张三",
-      patientAge: 35,
-      submitDate: "2024-01-15 14:30",
-      aiDiagnosis: "良性色素痣",
-      aiConfidence: 92.5,
-      riskLevel: "低风险",
-      symptoms: "无明显症状，发现色素斑块约2个月",
-      images: [
-        "/api/placeholder/300/300",
-        "/api/placeholder/300/300"
-      ],
-      urgency: "normal"
-    },
-    {
-      id: 2,
-      patientName: "李四",
-      patientAge: 52,
-      submitDate: "2024-01-15 16:45",
-      aiDiagnosis: "基底细胞癌可能",
-      aiConfidence: 78.3,
-      riskLevel: "高风险",
-      symptoms: "皮损逐渐增大，偶有出血，持续3个月",
-      images: [
-        "/api/placeholder/300/300"
-      ],
-      urgency: "high"
-    },
-    {
-      id: 3,
-      patientName: "王五",
-      patientAge: 28,
-      submitDate: "2024-01-15 10:15",
-      aiDiagnosis: "脂溢性皮炎",
-      aiConfidence: 89.7,
-      riskLevel: "低风险",
-      symptoms: "轻微瘙痒，皮肤油腻，反复发作",
-      images: [
-        "/api/placeholder/300/300"
-      ],
-      urgency: "low"
+  useEffect(() => {
+    loadPendingCases();
+  }, []);
+
+  const loadPendingCases = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await diagnosisService.getPendingDiagnoses();
+      if (error) {
+        console.error('获取待审核病例失败:', error);
+        toast({
+          title: "获取数据失败",
+          description: "无法加载待审核病例，请刷新页面重试",
+          variant: "destructive"
+        });
+      } else {
+        setPendingCases(data);
+      }
+    } catch (error) {
+      console.error('获取待审核病例失败:', error);
+      toast({
+        title: "获取数据失败",
+        description: "无法加载待审核病例，请刷新页面重试",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
-  const getUrgencyBadge = (urgency) => {
-    switch (urgency) {
-      case "high":
+  const getUrgencyBadge = (riskLevel: string) => {
+    switch (riskLevel) {
+      case "高风险":
         return <Badge className="bg-red-100 text-red-800">紧急</Badge>;
-      case "normal":
+      case "中风险":
         return <Badge className="bg-yellow-100 text-yellow-800">普通</Badge>;
-      case "low":
+      case "低风险":
         return <Badge className="bg-green-100 text-green-800">非紧急</Badge>;
       default:
-        return <Badge variant="secondary">{urgency}</Badge>;
+        return <Badge variant="secondary">普通</Badge>;
     }
   };
 
@@ -97,13 +84,13 @@ const DoctorReview = () => {
     }
   };
 
-  const handleCaseSelect = (caseItem) => {
+  const handleCaseSelect = (caseItem: DiagnosisRecord) => {
     setSelectedCase(caseItem);
     setReviewNotes("");
-    setFinalDiagnosis(caseItem.aiDiagnosis);
+    setFinalDiagnosis(caseItem.ai_diagnosis || "");
   };
 
-  const handleSubmitReview = async (decision) => {
+  const handleSubmitReview = async (decision: 'confirm' | 'modify') => {
     if (!reviewNotes.trim()) {
       toast({
         title: "请填写审核意见",
@@ -113,20 +100,44 @@ const DoctorReview = () => {
       return;
     }
 
+    if (!selectedCase) return;
+
     setIsSubmitting(true);
 
-    // 模拟提交过程
-    setTimeout(() => {
-      toast({
-        title: "审核完成",
-        description: `已${decision === 'confirm' ? '确认' : '修正'}诊断，患者将收到通知`,
+    try {
+      const { error } = await diagnosisService.updateDiagnosis(selectedCase.id, {
+        doctor_diagnosis: finalDiagnosis,
+        doctor_notes: reviewNotes,
+        status: 'reviewed'
       });
 
-      setSelectedCase(null);
-      setReviewNotes("");
-      setFinalDiagnosis("");
+      if (error) {
+        toast({
+          title: "提交失败",
+          description: "审核提交失败，请重试",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "审核完成",
+          description: `已${decision === 'confirm' ? '确认' : '修正'}诊断，患者将收到通知`,
+        });
+
+        setSelectedCase(null);
+        setReviewNotes("");
+        setFinalDiagnosis("");
+        loadPendingCases(); // 重新加载列表
+      }
+    } catch (error) {
+      console.error('提交审核失败:', error);
+      toast({
+        title: "提交失败",
+        description: "审核提交失败，请重试",
+        variant: "destructive"
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -144,42 +155,47 @@ const DoctorReview = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="space-y-1">
-              {pendingCases.map((caseItem) => (
-                <div
-                  key={caseItem.id}
-                  className={`p-4 cursor-pointer transition-colors hover:bg-gray-50 border-l-4 ${
-                    selectedCase?.id === caseItem.id 
-                      ? 'bg-blue-50 border-l-blue-500' 
-                      : caseItem.urgency === 'high' 
-                        ? 'border-l-red-500' 
-                        : 'border-l-transparent'
-                  }`}
-                  onClick={() => handleCaseSelect(caseItem)}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <User className="w-4 h-4 text-gray-500" />
-                      <span className="font-medium">{caseItem.patientName}</span>
-                      <span className="text-sm text-gray-500">({caseItem.patientAge}岁)</span>
+            {isLoading ? (
+              <div className="p-4 text-center text-gray-500">加载中...</div>
+            ) : pendingCases.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">暂无待审核病例</div>
+            ) : (
+              <div className="space-y-1">
+                {pendingCases.map((caseItem) => (
+                  <div
+                    key={caseItem.id}
+                    className={`p-4 cursor-pointer transition-colors hover:bg-gray-50 border-l-4 ${
+                      selectedCase?.id === caseItem.id 
+                        ? 'bg-blue-50 border-l-blue-500' 
+                        : caseItem.risk_level === '高风险' 
+                          ? 'border-l-red-500' 
+                          : 'border-l-transparent'
+                    }`}
+                    onClick={() => handleCaseSelect(caseItem)}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <User className="w-4 h-4 text-gray-500" />
+                        <span className="font-medium">{(caseItem as any).profiles?.name || '患者'}</span>
+                      </div>
+                      {getUrgencyBadge(caseItem.risk_level || '低风险')}
                     </div>
-                    {getUrgencyBadge(caseItem.urgency)}
+                    
+                    <div className="space-y-1 text-sm">
+                      <div className="flex items-center text-gray-600">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {new Date(caseItem.created_at).toLocaleString('zh-CN')}
+                      </div>
+                      <div className="font-medium">{caseItem.ai_diagnosis || '待分析'}</div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-gray-600">AI置信度: {caseItem.ai_confidence?.toFixed(1) || 0}%</span>
+                        {getRiskBadge(caseItem.risk_level || '低风险')}
+                      </div>
+                    </div>
                   </div>
-                  
-                  <div className="space-y-1 text-sm">
-                    <div className="flex items-center text-gray-600">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      {caseItem.submitDate}
-                    </div>
-                    <div className="font-medium">{caseItem.aiDiagnosis}</div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-600">AI置信度: {caseItem.aiConfidence}%</span>
-                      {getRiskBadge(caseItem.riskLevel)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -196,20 +212,19 @@ const DoctorReview = () => {
                     <User className="w-5 h-5 mr-2" />
                     患者信息
                   </span>
-                  {getUrgencyBadge(selectedCase.urgency)}
+                  {getUrgencyBadge(selectedCase.risk_level || '低风险')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <div><strong>姓名:</strong> {selectedCase.patientName}</div>
-                    <div><strong>年龄:</strong> {selectedCase.patientAge}岁</div>
-                    <div><strong>提交时间:</strong> {selectedCase.submitDate}</div>
+                    <div><strong>姓名:</strong> {(selectedCase as any).profiles?.name || '患者'}</div>
+                    <div><strong>提交时间:</strong> {new Date(selectedCase.created_at).toLocaleString('zh-CN')}</div>
                   </div>
                   <div className="space-y-2">
                     <div><strong>症状描述:</strong></div>
                     <div className="text-sm bg-gray-50 p-3 rounded-lg">
-                      {selectedCase.symptoms}
+                      {selectedCase.symptoms || '无症状描述'}
                     </div>
                   </div>
                 </div>
@@ -227,11 +242,11 @@ const DoctorReview = () => {
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-2">
-                    <div><strong>AI诊断:</strong> {selectedCase.aiDiagnosis}</div>
-                    <div><strong>置信度:</strong> {selectedCase.aiConfidence}%</div>
+                    <div><strong>AI诊断:</strong> {selectedCase.ai_diagnosis || '待分析'}</div>
+                    <div><strong>置信度:</strong> {selectedCase.ai_confidence?.toFixed(1) || 0}%</div>
                     <div className="flex items-center space-x-2">
                       <strong>风险等级:</strong>
-                      {getRiskBadge(selectedCase.riskLevel)}
+                      {getRiskBadge(selectedCase.risk_level || '低风险')}
                     </div>
                   </div>
                 </div>
@@ -240,7 +255,7 @@ const DoctorReview = () => {
                 <div>
                   <h4 className="font-medium mb-3">皮肤图像</h4>
                   <div className="grid grid-cols-2 gap-4">
-                    {selectedCase.images.map((image, index) => (
+                    {selectedCase.image_urls.map((image, index) => (
                       <div key={index} className="border rounded-lg overflow-hidden">
                         <img 
                           src={image} 
@@ -270,7 +285,7 @@ const DoctorReview = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={selectedCase.aiDiagnosis}>确认AI诊断: {selectedCase.aiDiagnosis}</SelectItem>
+                      <SelectItem value={selectedCase.ai_diagnosis || ''}>确认AI诊断: {selectedCase.ai_diagnosis || '待分析'}</SelectItem>
                       <SelectItem value="良性色素痣">良性色素痣</SelectItem>
                       <SelectItem value="脂溢性角化病">脂溢性角化病</SelectItem>
                       <SelectItem value="基底细胞癌">基底细胞癌</SelectItem>
