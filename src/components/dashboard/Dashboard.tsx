@@ -1,5 +1,7 @@
 
 import { useState } from "react";
+import { useDoctorStats } from "@/hooks/useDoctorStats";
+import { usePatientStats } from "@/hooks/usePatientStats";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,6 +29,8 @@ import PatientManagement from "./PatientManagement";
 const Dashboard = () => {
   const { profile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState("upload");
+  const doctorStats = useDoctorStats();
+  const patientStats = usePatientStats();
 
   const isDoctor = profile?.role === "doctor";
 
@@ -134,7 +138,12 @@ const Dashboard = () => {
                   <FileText className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{isDoctor ? "12" : "8"}</div>
+                  <div className="text-2xl font-bold">
+                    {isDoctor 
+                      ? (doctorStats.isLoading ? "..." : doctorStats.pendingCount)
+                      : (patientStats.isLoading ? "..." : patientStats.totalDiagnoses)
+                    }
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {isDoctor ? "需要您审核的病例" : "您的诊断记录"}
                   </p>
@@ -149,9 +158,14 @@ const Dashboard = () => {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{isDoctor ? "156" : "3"}</div>
+                  <div className="text-2xl font-bold">
+                    {isDoctor 
+                      ? (doctorStats.isLoading ? "..." : doctorStats.monthlyReviewed)
+                      : (patientStats.isLoading ? "..." : patientStats.monthlyDiagnoses)
+                    }
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    较上月 +{isDoctor ? "23%" : "50%"}
+                    本月统计数据
                   </p>
                 </CardContent>
               </Card>
@@ -164,7 +178,12 @@ const Dashboard = () => {
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{isDoctor ? "98.5%" : "5"}</div>
+                  <div className="text-2xl font-bold">
+                    {isDoctor 
+                      ? (doctorStats.isLoading ? "..." : `${doctorStats.accuracy}%`)
+                      : (patientStats.isLoading ? "..." : patientStats.confirmedDiagnoses)
+                    }
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {isDoctor ? "AI诊断准确率" : "医生已确认"}
                   </p>
@@ -179,7 +198,12 @@ const Dashboard = () => {
                   <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{isDoctor ? "2.4h" : "2"}</div>
+                  <div className="text-2xl font-bold">
+                    {isDoctor 
+                      ? (doctorStats.isLoading ? "..." : `${doctorStats.avgResponseTime}h`)
+                      : (patientStats.isLoading ? "..." : patientStats.pendingDiagnoses)
+                    }
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {isDoctor ? "平均响应时间" : "等待医生确认"}
                   </p>
