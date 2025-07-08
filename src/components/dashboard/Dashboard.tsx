@@ -22,6 +22,7 @@ import DiagnosisUpload from "./DiagnosisUpload";
 import DiagnosisHistory from "./DiagnosisHistory";
 import DoctorReview from "./DoctorReview";
 import HealthAssistant from "./HealthAssistant";
+import PatientManagement from "./PatientManagement";
 
 const Dashboard = () => {
   const { profile, signOut } = useAuth();
@@ -192,17 +193,7 @@ const Dashboard = () => {
             )}
             {activeTab === "history" && <DiagnosisHistory isDoctor={isDoctor} />}
             {activeTab === "assistant" && !isDoctor && <HealthAssistant />}
-            {activeTab === "patients" && isDoctor && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>患者管理</CardTitle>
-                  <CardDescription>管理您的患者信息</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-gray-500 py-8">患者管理功能开发中...</p>
-                </CardContent>
-              </Card>
-            )}
+            {activeTab === "patients" && isDoctor && <PatientManagement />}
             {activeTab === "settings" && (
               <Card>
                 <CardHeader>
