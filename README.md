@@ -140,5 +140,3 @@ derma-view-ai-portal/
 之后，您可以将`dist/`目录部署到任何静态网站托管服务，如Vercel、Netlify或GitHub Pages。
 
 -----
-
-希望这份文档能帮助您更好地了解和使用这个项目！如果您有任何问题，请随时提出。
