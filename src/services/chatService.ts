@@ -31,15 +31,23 @@ export const chatService = {
     return { data: data as ChatMessage, error };
   },
 
-  // 智能健康助手回复 - 这里可以集成真实的智能API
+  // 智能健康助手回复 - 使用 Gemini API
   async getAIResponse(userMessage: string): Promise<string> {
-    // TODO: 这里可以集成真实的智能健康助手API
-    // 比如 OpenAI GPT, Google Gemini, 或者自定义的健康智能模型
-    
-    // 模拟延迟
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
-    
-    return generateHealthAdvice(userMessage);
+    try {
+      const response = await supabase.functions.invoke('health-chat', {
+        body: { message: userMessage }
+      });
+
+      if (response.error) {
+        console.error('Edge function error:', response.error);
+        return generateHealthAdvice(userMessage);
+      }
+
+      return response.data?.response || generateHealthAdvice(userMessage);
+    } catch (error) {
+      console.error('Error calling health-chat function:', error);
+      return generateHealthAdvice(userMessage);
+    }
   }
 };
 
