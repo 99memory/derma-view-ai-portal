@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useDoctorStats } from "@/hooks/useDoctorStats";
 import { usePatientStats } from "@/hooks/usePatientStats";
@@ -7,48 +6,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { 
-  LogOut, 
-  Upload, 
-  History, 
-  Users, 
-  Settings, 
-  Bell,
-  FileText,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  MessageCircle
-} from "lucide-react";
+import { LogOut, Upload, History, Users, Settings, Bell, FileText, Clock, CheckCircle, AlertTriangle, MessageCircle } from "lucide-react";
 import DiagnosisUpload from "./DiagnosisUpload";
 import DiagnosisHistory from "./DiagnosisHistory";
 import DoctorReview from "./DoctorReview";
 import HealthAssistant from "./HealthAssistant";
 import PatientManagement from "./PatientManagement";
-
 const Dashboard = () => {
-  const { profile, signOut } = useAuth();
+  const {
+    profile,
+    signOut
+  } = useAuth();
   const [activeTab, setActiveTab] = useState("upload");
   const doctorStats = useDoctorStats();
   const patientStats = usePatientStats();
-
   const isDoctor = profile?.role === "doctor";
-
   const handleLogout = async () => {
     await signOut();
   };
-
   if (!profile) {
     return <div>加载中...</div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gray-50">
+  return <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b shadow-sm">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-gray-900">皮肤辅助诊断平台</h1>
+            <h1 className="text-2xl font-bold text-gray-900">皮肤癌辅助诊断平台</h1>
             <Badge variant={isDoctor ? "default" : "secondary"}>
               {isDoctor ? "医生" : "患者"}
             </Badge>
@@ -78,47 +62,23 @@ const Dashboard = () => {
         {/* Sidebar */}
         <aside className="w-64 bg-white border-r min-h-screen p-4">
           <nav className="space-y-2">
-            <Button
-              variant={activeTab === "upload" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveTab("upload")}
-            >
+            <Button variant={activeTab === "upload" ? "default" : "ghost"} className="w-full justify-start" onClick={() => setActiveTab("upload")}>
               <Upload className="w-4 h-4 mr-2" />
               {isDoctor ? "待审核诊断" : "上传诊断"}
             </Button>
-            <Button
-              variant={activeTab === "history" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveTab("history")}
-            >
+            <Button variant={activeTab === "history" ? "default" : "ghost"} className="w-full justify-start" onClick={() => setActiveTab("history")}>
               <History className="w-4 h-4 mr-2" />
               {isDoctor ? "审核历史" : "诊断历史"}
             </Button>
-            {!isDoctor && (
-              <Button
-                variant={activeTab === "assistant" ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => setActiveTab("assistant")}
-              >
+            {!isDoctor && <Button variant={activeTab === "assistant" ? "default" : "ghost"} className="w-full justify-start" onClick={() => setActiveTab("assistant")}>
                 <MessageCircle className="w-4 h-4 mr-2" />
                 健康助手
-              </Button>
-            )}
-            {isDoctor && (
-              <Button
-                variant={activeTab === "patients" ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => setActiveTab("patients")}
-              >
+              </Button>}
+            {isDoctor && <Button variant={activeTab === "patients" ? "default" : "ghost"} className="w-full justify-start" onClick={() => setActiveTab("patients")}>
                 <Users className="w-4 h-4 mr-2" />
                 患者管理
-              </Button>
-            )}
-            <Button
-              variant={activeTab === "settings" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveTab("settings")}
-            >
+              </Button>}
+            <Button variant={activeTab === "settings" ? "default" : "ghost"} className="w-full justify-start" onClick={() => setActiveTab("settings")}>
               <Settings className="w-4 h-4 mr-2" />
               设置
             </Button>
@@ -139,10 +99,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {isDoctor 
-                      ? (doctorStats.isLoading ? "..." : doctorStats.pendingCount)
-                      : (patientStats.isLoading ? "..." : patientStats.totalDiagnoses)
-                    }
+                    {isDoctor ? doctorStats.isLoading ? "..." : doctorStats.pendingCount : patientStats.isLoading ? "..." : patientStats.totalDiagnoses}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {isDoctor ? "需要您审核的病例" : "您的诊断记录"}
@@ -159,10 +116,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {isDoctor 
-                      ? (doctorStats.isLoading ? "..." : doctorStats.monthlyReviewed)
-                      : (patientStats.isLoading ? "..." : patientStats.monthlyDiagnoses)
-                    }
+                    {isDoctor ? doctorStats.isLoading ? "..." : doctorStats.monthlyReviewed : patientStats.isLoading ? "..." : patientStats.monthlyDiagnoses}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     本月统计数据
@@ -179,10 +133,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {isDoctor 
-                      ? (doctorStats.isLoading ? "..." : `${doctorStats.accuracy}%`)
-                      : (patientStats.isLoading ? "..." : patientStats.confirmedDiagnoses)
-                    }
+                    {isDoctor ? doctorStats.isLoading ? "..." : `${doctorStats.accuracy}%` : patientStats.isLoading ? "..." : patientStats.confirmedDiagnoses}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {isDoctor ? "智能诊断准确率" : "医生已确认"}
@@ -199,10 +150,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {isDoctor 
-                      ? (doctorStats.isLoading ? "..." : `${doctorStats.avgResponseTime}h`)
-                      : (patientStats.isLoading ? "..." : patientStats.pendingDiagnoses)
-                    }
+                    {isDoctor ? doctorStats.isLoading ? "..." : `${doctorStats.avgResponseTime}h` : patientStats.isLoading ? "..." : patientStats.pendingDiagnoses}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {isDoctor ? "平均响应时间" : "等待医生确认"}
@@ -212,14 +160,11 @@ const Dashboard = () => {
             </div>
 
             {/* Tab Content */}
-            {activeTab === "upload" && (
-              isDoctor ? <DoctorReview /> : <DiagnosisUpload />
-            )}
+            {activeTab === "upload" && (isDoctor ? <DoctorReview /> : <DiagnosisUpload />)}
             {activeTab === "history" && <DiagnosisHistory isDoctor={isDoctor} />}
             {activeTab === "assistant" && !isDoctor && <HealthAssistant />}
             {activeTab === "patients" && isDoctor && <PatientManagement />}
-            {activeTab === "settings" && (
-              <Card>
+            {activeTab === "settings" && <Card>
                 <CardHeader>
                   <CardTitle>账户设置</CardTitle>
                   <CardDescription>管理您的账户偏好</CardDescription>
@@ -227,13 +172,10 @@ const Dashboard = () => {
                 <CardContent>
                   <p className="text-center text-gray-500 py-8">设置功能开发中...</p>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
