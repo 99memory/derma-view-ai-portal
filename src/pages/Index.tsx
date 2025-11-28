@@ -23,7 +23,7 @@ const Index = () => {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Stethoscope className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900">皮肤健康AI</h1>
+            <h1 className="text-xl font-bold text-gray-900">皮肤辅助诊断</h1>
           </div>
           <Link to="/auth">
             <Button>
@@ -37,7 +37,7 @@ const Index = () => {
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-16 text-center">
         <Badge className="mb-4" variant="secondary">
-          AI驱动的皮肤健康诊断
+          智能驱动的皮肤健康诊断
         </Badge>
         <h1 className="text-5xl font-bold text-gray-900 mb-6">
           智能诊断，守护您的
@@ -65,7 +65,7 @@ const Index = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">为什么选择我们？</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            我们结合最新的AI技术和专业医疗知识，为您提供可靠的皮肤健康服务
+            我们结合最新的智能技术和专业医疗知识，为您提供可靠的皮肤健康服务
           </p>
         </div>
         
@@ -75,7 +75,7 @@ const Index = () => {
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Brain className="w-6 h-6 text-blue-600" />
               </div>
-              <CardTitle>AI智能分析</CardTitle>
+              <CardTitle>智能分析</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="text-base">
@@ -94,7 +94,7 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <CardDescription className="text-base">
-                所有AI诊断结果都会经过专业皮肤科医生的二次审核，
+                所有智能诊断结果都会经过专业皮肤科医生的二次审核，
                 确保诊断的准确性和可靠性。
               </CardDescription>
             </CardContent>
@@ -151,7 +151,7 @@ const Index = () => {
                   <CheckCircle className="w-5 h-5 text-green-600 mt-1" />
                   <div>
                     <h3 className="font-semibold">健康指导</h3>
-                    <p className="text-gray-600">AI健康助手提供个性化建议</p>
+                    <p className="text-gray-600">智能健康助手提供个性化建议</p>
                   </div>
                 </div>
               </div>
@@ -159,7 +159,7 @@ const Index = () => {
             <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8">
               <div className="text-center">
                 <div className="text-4xl font-bold text-blue-600 mb-2">98.5%</div>
-                <div className="text-gray-600 mb-6">AI诊断准确率</div>
+                <div className="text-gray-600 mb-6">智能诊断准确率</div>
                 <div className="flex items-center justify-center space-x-1 mb-4">
                   {[1,2,3,4,5].map((star) => (
                     <Star key={star} className="w-5 h-5 text-yellow-400 fill-current" />
@@ -181,7 +181,7 @@ const Index = () => {
           <CardHeader>
             <CardTitle className="text-2xl">开始您的健康之旅</CardTitle>
             <CardDescription className="text-blue-100">
-              立即注册，体验AI驱动的皮肤健康诊断服务
+              立即注册，体验智能驱动的皮肤健康诊断服务
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -202,10 +202,10 @@ const Index = () => {
             <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center">
               <Stethoscope className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold">皮肤健康AI平台</span>
+            <span className="font-bold">皮肤辅助诊断平台</span>
           </div>
           <p className="text-gray-400">
-            © 2024 皮肤健康AI平台. 保留所有权利.
+            © 2024 皮肤辅助诊断平台. 保留所有权利.
           </p>
         </div>
       </footer>

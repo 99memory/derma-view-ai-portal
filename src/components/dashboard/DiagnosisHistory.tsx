@@ -127,7 +127,7 @@ const DiagnosisHistory = ({ isDoctor }) => {
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <h3 className="font-medium text-lg">{record.ai_diagnosis || "AI诊断中"}</h3>
+                          <h3 className="font-medium text-lg">{record.ai_diagnosis || "智能诊断中"}</h3>
                           {getStatusBadge(record.status)}
                           {getRiskBadge(record.risk_level || "")}
                         </div>
@@ -139,7 +139,7 @@ const DiagnosisHistory = ({ isDoctor }) => {
                       <div className="grid md:grid-cols-2 gap-4 text-sm">
                         <div className="space-y-2">
                           <div>
-                            <span className="text-gray-600">AI置信度:</span>
+                            <span className="text-gray-600">智能置信度:</span>
                             <span className="ml-2 font-medium">{record.ai_confidence ? record.ai_confidence.toFixed(1) + '%' : '待分析'}</span>
                           </div>
                           <div>

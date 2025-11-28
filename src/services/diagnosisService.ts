@@ -92,17 +92,17 @@ export const diagnosisService = {
     return { data: data as DiagnosisRecord, error };
   },
 
-  // AI诊断接口 - 预留给您的模型
+  // 智能诊断接口 - 预留给您的模型
   async performAIDiagnosis(imageUrls: string[]): Promise<{
     diagnosis: string;
     confidence: number;
     riskLevel: '低风险' | '中风险' | '高风险';
   }> {
-    // TODO: 这里将调用您训练好的AI模型
+    // TODO: 这里将调用您训练好的智能模型
     // 目前返回模拟数据
-    console.log('调用AI诊断模型，图片URLs:', imageUrls);
+    console.log('调用智能诊断模型，图片URLs:', imageUrls);
     
-    // 模拟AI分析延迟
+    // 模拟智能分析延迟
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // 返回模拟结果 - 您可以替换为真实的模型调用

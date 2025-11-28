@@ -31,10 +31,10 @@ export const chatService = {
     return { data: data as ChatMessage, error };
   },
 
-  // AI健康助手回复 - 这里可以集成真实的AI API
+  // 智能健康助手回复 - 这里可以集成真实的智能API
   async getAIResponse(userMessage: string): Promise<string> {
-    // TODO: 这里可以集成真实的AI健康助手API
-    // 比如 OpenAI GPT, Google Gemini, 或者自定义的健康AI模型
+    // TODO: 这里可以集成真实的智能健康助手API
+    // 比如 OpenAI GPT, Google Gemini, 或者自定义的健康智能模型
     
     // 模拟延迟
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
@@ -69,7 +69,7 @@ function generateHealthAdvice(userInput: string): string {
 • 出血、溃烂、持续疼痛
 • 淋巴结肿大
 
-💡 您也可以使用我们的AI皮肤诊断功能进行初步评估。
+💡 您也可以使用我们的智能皮肤诊断功能进行初步评估。
 
 ⚠️ 此建议仅供参考，请及时咨询皮肤科医生获得专业诊断。`;
   }
@@ -191,7 +191,7 @@ function generateHealthAdvice(userInput: string): string {
   // 通用健康咨询
   return `🏥 **健康生活指导**
 
-感谢您信任我们的AI健康助手！基于您的咨询，我为您提供以下综合建议：
+感谢您信任我们的智能健康助手！基于您的咨询，我为您提供以下综合建议：
 
 **日常健康维护：**
 • 规律作息：保持稳定的睡眠和饮食时间
@@ -218,7 +218,7 @@ function generateHealthAdvice(userInput: string): string {
 • 专业医疗建议
 
 🎯 **下一步行动建议：**
-1. 如有皮肤问题，可使用我们的AI诊断功能
+1. 如有皮肤问题，可使用我们的智能诊断功能
 2. 制定个人健康计划
 3. 记录症状日记
 4. 必要时预约专科医生
