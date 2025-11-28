@@ -1,21 +1,10 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Stethoscope, 
-  Shield, 
-  Brain, 
-  Users,
-  ArrowRight,
-  CheckCircle,
-  Star
-} from "lucide-react";
+import { Stethoscope, Shield, Brain, Users, ArrowRight, CheckCircle, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+  return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b shadow-sm">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
@@ -23,7 +12,7 @@ const Index = () => {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Stethoscope className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900">皮肤辅助诊断</h1>
+            <h1 className="text-xl font-bold text-gray-900">皮肤癌症辅助诊断平台</h1>
           </div>
           <Link to="/auth">
             <Button>
@@ -161,9 +150,7 @@ const Index = () => {
                 <div className="text-4xl font-bold text-blue-600 mb-2">98.5%</div>
                 <div className="text-gray-600 mb-6">智能诊断准确率</div>
                 <div className="flex items-center justify-center space-x-1 mb-4">
-                  {[1,2,3,4,5].map((star) => (
-                    <Star key={star} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
+                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className="w-5 h-5 text-yellow-400 fill-current" />)}
                 </div>
                 <p className="text-sm text-gray-600">
                   "专业可靠的皮肤健康服务，让我及时发现了问题"
@@ -209,8 +196,6 @@ const Index = () => {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
