@@ -73,7 +73,7 @@ const HealthAssistant = () => {
   const setWelcomeMessage = () => {
     setMessages([{
       id: "welcome",
-      content: "您好！我是您的AI健康助手小助 🏥\n\n我可以为您提供：\n• 健康咨询和生活建议\n• 皮肤问题初步评估\n• 营养和运动指导\n• 心理健康支持\n\n请注意，我的建议仅供参考，不能替代专业医疗诊断。有什么可以帮助您的吗？",
+      content: "您好！我是您的智能健康助手小助 🏥\n\n我可以为您提供：\n• 健康咨询和生活建议\n• 皮肤问题初步评估\n• 营养和运动指导\n• 心理健康支持\n\n请注意，我的建议仅供参考，不能替代专业医疗诊断。有什么可以帮助您的吗？",
       role: "assistant",
       timestamp: new Date()
     }]);
@@ -95,7 +95,7 @@ const HealthAssistant = () => {
     setIsLoading(true);
 
     try {
-      // 调用AI服务获取回复
+      // 调用智能服务获取回复
       const aiResponse = await chatService.getAIResponse(currentMessage);
       
       const assistantMessage: Message = {
@@ -118,7 +118,7 @@ const HealthAssistant = () => {
         });
       }
     } catch (error) {
-      console.error('获取AI回复失败:', error);
+      console.error('获取智能回复失败:', error);
       const errorMessage: Message = {
         id: `error-${Date.now()}`,
         content: "抱歉，我现在无法回复您的问题。请稍后再试，或者联系技术支持。",
@@ -129,7 +129,7 @@ const HealthAssistant = () => {
       
       toast({
         title: "连接失败",
-        description: "无法连接到AI服务，请检查网络连接",
+        description: "无法连接到智能服务，请检查网络连接",
         variant: "destructive"
       });
     } finally {
@@ -159,14 +159,14 @@ const HealthAssistant = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Avatar className="w-12 h-12">
-              <AvatarImage src={healthAssistantAvatar} alt="AI健康助手" />
+              <AvatarImage src={healthAssistantAvatar} alt="智能健康助手" />
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                AI
+                助
               </AvatarFallback>
             </Avatar>
             <div>
               <CardTitle className="flex items-center gap-2">
-                AI健康助手小助
+                智能健康助手小助
                 <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">在线</Badge>
               </CardTitle>
               <CardDescription>
@@ -209,7 +209,7 @@ const HealthAssistant = () => {
               >
                 {message.role === "assistant" && (
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src={healthAssistantAvatar} alt="AI健康助手" />
+                    <AvatarImage src={healthAssistantAvatar} alt="智能健康助手" />
                     <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
                       <Bot className="w-4 h-4" />
                     </AvatarFallback>
@@ -251,7 +251,7 @@ const HealthAssistant = () => {
             {isLoading && (
               <div className="flex gap-3 justify-start">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={healthAssistantAvatar} alt="AI健康助手" />
+                  <AvatarImage src={healthAssistantAvatar} alt="智能健康助手" />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
                     <Bot className="w-4 h-4" />
                   </AvatarFallback>
@@ -262,7 +262,7 @@ const HealthAssistant = () => {
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">AI助手正在思考...</div>
+                  <div className="text-xs text-gray-500 mt-1">智能助手正在思考...</div>
                 </div>
               </div>
             )}
@@ -288,7 +288,7 @@ const HealthAssistant = () => {
             </Button>
           </div>
           <p className="text-xs text-gray-500 mt-2 flex items-center justify-between">
-            <span>AI助手的建议仅供参考，不能替代专业医疗建议</span>
+            <span>智能助手的建议仅供参考，不能替代专业医疗建议</span>
             <span className="text-xs text-gray-400">
               {messages.filter(m => m.role === "user").length} 条对话
             </span>

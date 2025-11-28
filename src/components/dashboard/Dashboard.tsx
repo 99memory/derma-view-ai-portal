@@ -48,7 +48,7 @@ const Dashboard = () => {
       <header className="bg-white border-b shadow-sm">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-gray-900">皮肤健康AI平台</h1>
+            <h1 className="text-2xl font-bold text-gray-900">皮肤辅助诊断平台</h1>
             <Badge variant={isDoctor ? "default" : "secondary"}>
               {isDoctor ? "医生" : "患者"}
             </Badge>
@@ -185,7 +185,7 @@ const Dashboard = () => {
                     }
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {isDoctor ? "AI诊断准确率" : "医生已确认"}
+                    {isDoctor ? "智能诊断准确率" : "医生已确认"}
                   </p>
                 </CardContent>
               </Card>

@@ -48,11 +48,11 @@ const DiagnosisUpload = () => {
     setIsAnalyzing(true);
     setProgress(0);
 
-    // 模拟AI分析过程
+    // 模拟智能分析过程
     const steps = [
       { progress: 20, message: "图像预处理中..." },
       { progress: 40, message: "特征提取中..." },
-      { progress: 60, message: "AI模型分析中..." },
+      { progress: 60, message: "智能模型分析中..." },
       { progress: 80, message: "结果生成中..." },
       { progress: 100, message: "分析完成" }
     ];
@@ -62,7 +62,7 @@ const DiagnosisUpload = () => {
       setProgress(step.progress);
     }
 
-    // 根据症状描述判断AI分析结果
+    // 根据症状描述判断智能分析结果
     const hasDetailedSymptoms = symptoms && symptoms.length > 20;
     
     const mockResult = hasDetailedSymptoms ? {
@@ -113,7 +113,7 @@ const DiagnosisUpload = () => {
       
       if (error) throw error;
       
-      // 更新记录的AI诊断结果
+      // 更新记录的智能诊断结果
       if (data) {
         const { error: updateError } = await supabase
           .from('diagnosis_records')
@@ -125,18 +125,18 @@ const DiagnosisUpload = () => {
           .eq('id', data.id);
         
         if (updateError) {
-          console.error('更新AI诊断结果失败:', updateError);
+          console.error('更新智能诊断结果失败:', updateError);
         }
       }
 
       toast({
-        title: "AI分析完成",
+        title: "智能分析完成",
         description: "分析结果已生成并保存，建议医生进一步确认",
       });
     } catch (error) {
       console.error("保存诊断记录失败:", error);
       toast({
-        title: "AI分析完成",
+        title: "智能分析完成",
         description: "分析结果已生成，但保存失败。建议医生进一步确认",
         variant: "destructive"
       });
@@ -163,7 +163,7 @@ const DiagnosisUpload = () => {
               上传皮肤图片
             </CardTitle>
             <CardDescription>
-              上传清晰的皮肤病变图片以进行AI分析
+              上传清晰的皮肤病变图片以进行智能分析
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -211,12 +211,12 @@ const DiagnosisUpload = () => {
               {isAnalyzing ? (
                 <>
                   <Brain className="w-4 h-4 mr-2 animate-pulse" />
-                  AI分析中...
+                  智能分析中...
                 </>
               ) : (
                 <>
                   <Brain className="w-4 h-4 mr-2" />
-                  开始AI分析
+                  开始智能分析
                 </>
               )}
             </Button>
@@ -283,7 +283,7 @@ const DiagnosisUpload = () => {
                   <span className="text-sm font-medium text-blue-800">温馨提示</span>
                 </div>
                 <p className="text-sm text-blue-700 mt-1">
-                  AI分析仅供参考，最终诊断需要专业医生确认
+                  智能分析仅供参考，最终诊断需要专业医生确认
                 </p>
               </div>
             </div>
@@ -298,7 +298,7 @@ const DiagnosisUpload = () => {
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center">
                 <Brain className="w-5 h-5 mr-2" />
-                AI分析结果
+                智能分析结果
               </span>
               <Badge className={getRiskBadgeColor(analysisResult.riskLevel)}>
                 {analysisResult.riskLevel}
@@ -367,7 +367,7 @@ const DiagnosisUpload = () => {
                 <span className="font-medium text-yellow-800">重要提醒</span>
               </div>
               <p className="text-sm text-yellow-700 mt-2">
-                此结果仅为AI初步分析，不能替代专业医生诊断。请等待医生复诊确认，如有紧急情况请立即就医。
+                此结果仅为智能初步分析，不能替代专业医生诊断。请等待医生复诊确认，如有紧急情况请立即就医。
               </p>
             </div>
           </CardContent>

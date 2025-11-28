@@ -188,7 +188,7 @@ const DoctorReview = () => {
                       </div>
                       <div className="font-medium">{caseItem.ai_diagnosis || '待分析'}</div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-gray-600">AI置信度: {caseItem.ai_confidence?.toFixed(1) || 0}%</span>
+                        <span className="text-gray-600">智能置信度: {caseItem.ai_confidence?.toFixed(1) || 0}%</span>
                         {getRiskBadge(caseItem.risk_level || '低风险')}
                       </div>
                     </div>
@@ -236,13 +236,13 @@ const DoctorReview = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Brain className="w-5 h-5 mr-2" />
-                  AI分析结果
+                  智能分析结果
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-2">
-                    <div><strong>AI诊断:</strong> {selectedCase.ai_diagnosis || '待分析'}</div>
+                    <div><strong>智能诊断:</strong> {selectedCase.ai_diagnosis || '待分析'}</div>
                     <div><strong>置信度:</strong> {selectedCase.ai_confidence?.toFixed(1) || 0}%</div>
                     <div className="flex items-center space-x-2">
                       <strong>风险等级:</strong>
@@ -285,7 +285,7 @@ const DoctorReview = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={selectedCase.ai_diagnosis || ''}>确认AI诊断: {selectedCase.ai_diagnosis || '待分析'}</SelectItem>
+                      <SelectItem value={selectedCase.ai_diagnosis || ''}>确认智能诊断: {selectedCase.ai_diagnosis || '待分析'}</SelectItem>
                       <SelectItem value="良性色素痣">良性色素痣</SelectItem>
                       <SelectItem value="脂溢性角化病">脂溢性角化病</SelectItem>
                       <SelectItem value="基底细胞癌">基底细胞癌</SelectItem>
