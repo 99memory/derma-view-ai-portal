@@ -56,17 +56,14 @@ export const diagnosisService = {
   },
 
   // 医生获取待审核的诊断
-  async getPendingDiagnoses(): Promise<{ data: DiagnosisRecord[], error: any }> {
+  async getPendingDiagnoses(): Promise<{ data: any[], error: any }> {
     const { data, error } = await supabase
       .from('diagnosis_records')
-      .select(`
-        *,
-        profiles!diagnosis_records_patient_id_fkey(name)
-      `)
+      .select('*')
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
-    return { data: (data as DiagnosisRecord[]) || [], error };
+    return { data: data || [], error };
   },
 
   // 医生更新诊断结果

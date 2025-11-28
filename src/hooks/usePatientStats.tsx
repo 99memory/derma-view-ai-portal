@@ -11,7 +11,7 @@ interface PatientStats {
 }
 
 export const usePatientStats = () => {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [stats, setStats] = useState<PatientStats>({
     totalDiagnoses: 0,
     monthlyDiagnoses: 0,
@@ -21,20 +21,20 @@ export const usePatientStats = () => {
   });
 
   useEffect(() => {
-    if (profile?.role === 'patient') {
+    if (profile?.role === 'patient' && user?.id) {
       loadPatientStats();
     }
-  }, [profile]);
+  }, [profile, user]);
 
   const loadPatientStats = async () => {
     try {
-      if (!profile?.id) return;
+      if (!user?.id) return;
 
       // 获取患者总诊断数
       const { count: totalDiagnoses } = await supabase
         .from('diagnosis_records')
         .select('*', { count: 'exact', head: true })
-        .eq('patient_id', profile.id);
+        .eq('patient_id', user.id);
 
       // 获取本月诊断数
       const currentMonth = new Date();
@@ -42,21 +42,21 @@ export const usePatientStats = () => {
       const { count: monthlyDiagnoses } = await supabase
         .from('diagnosis_records')
         .select('*', { count: 'exact', head: true })
-        .eq('patient_id', profile.id)
+        .eq('patient_id', user.id)
         .gte('created_at', firstDayOfMonth.toISOString());
 
       // 获取已确认诊断数
       const { count: confirmedDiagnoses } = await supabase
         .from('diagnosis_records')
         .select('*', { count: 'exact', head: true })
-        .eq('patient_id', profile.id)
+        .eq('patient_id', user.id)
         .eq('status', 'reviewed');
 
       // 获取待审核诊断数
       const { count: pendingDiagnoses } = await supabase
         .from('diagnosis_records')
         .select('*', { count: 'exact', head: true })
-        .eq('patient_id', profile.id)
+        .eq('patient_id', user.id)
         .eq('status', 'pending');
 
       setStats({

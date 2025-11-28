@@ -23,13 +23,54 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchProfileWithRole = async (userId: string) => {
+    try {
+      // Fetch profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        return null;
+      }
+
+      // Fetch role
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (roleError) {
+        console.error('Error fetching role:', roleError);
+      }
+
+      if (profileData) {
+        return {
+          id: profileData.id,
+          name: profileData.name,
+          role: roleData?.role || 'patient',
+          avatar_url: profileData.avatar_url,
+          created_at: profileData.created_at,
+          updated_at: profileData.updated_at
+        } as Profile;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error in fetchProfileWithRole:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
 
     const initializeAuth = async () => {
       console.log('正在初始化身份验证...');
       try {
-        // Get current session
         const { data: { session } } = await supabase.auth.getSession();
         console.log('获取到的会话:', session);
         
@@ -40,21 +81,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (session?.user) {
           console.log('正在获取用户配置文件...');
-          // Try to fetch profile
-          try {
-            const { data: profileData, error } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .maybeSingle();
-            
-            console.log('配置文件数据:', profileData, '错误:', error);
-            
-            if (mounted && profileData) {
-              setProfile(profileData as Profile);
-            }
-          } catch (error) {
-            console.error('Error fetching profile:', error);
+          const profileData = await fetchProfileWithRole(session.user.id);
+          if (mounted && profileData) {
+            setProfile(profileData);
           }
         }
       } catch (error) {
@@ -67,7 +96,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
@@ -76,20 +104,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch profile data asynchronously without blocking
           setTimeout(async () => {
-            try {
-              const { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .maybeSingle();
-              
-              if (mounted && profileData) {
-                setProfile(profileData as Profile);
-              }
-            } catch (error) {
-              console.error('Error fetching profile on auth change:', error);
+            const profileData = await fetchProfileWithRole(session.user.id);
+            if (mounted && profileData) {
+              setProfile(profileData);
             }
           }, 0);
         } else {
@@ -98,7 +116,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
-    // Initialize
     initializeAuth();
 
     return () => {
@@ -131,7 +148,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       toast({
         title: "注册成功",
-        description: "请检查您的邮箱并点击确认链接完成注册",
+        description: "账户创建成功，正在自动登录...",
       });
     }
 
