@@ -7,144 +7,20 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
-      chat_messages: {
-        Row: {
-          created_at: string
-          id: string
-          message: string
-          response: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          message: string
-          response: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          message?: string
-          response?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "chat_messages_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      diagnosis_records: {
-        Row: {
-          ai_confidence: number | null
-          ai_diagnosis: string | null
-          created_at: string
-          doctor_diagnosis: string | null
-          doctor_id: string | null
-          doctor_notes: string | null
-          id: string
-          image_urls: string[]
-          patient_id: string
-          risk_level: string | null
-          status: string
-          symptoms: string | null
-          updated_at: string
-        }
-        Insert: {
-          ai_confidence?: number | null
-          ai_diagnosis?: string | null
-          created_at?: string
-          doctor_diagnosis?: string | null
-          doctor_id?: string | null
-          doctor_notes?: string | null
-          id?: string
-          image_urls: string[]
-          patient_id: string
-          risk_level?: string | null
-          status?: string
-          symptoms?: string | null
-          updated_at?: string
-        }
-        Update: {
-          ai_confidence?: number | null
-          ai_diagnosis?: string | null
-          created_at?: string
-          doctor_diagnosis?: string | null
-          doctor_id?: string | null
-          doctor_notes?: string | null
-          id?: string
-          image_urls?: string[]
-          patient_id?: string
-          risk_level?: string | null
-          status?: string
-          symptoms?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "diagnosis_records_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "diagnosis_records_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string
-          id: string
-          name: string
-          role: string
-          updated_at: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          id: string
-          name: string
-          role: string
-          updated_at?: string
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string
-          id?: string
-          name?: string
-          role?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
