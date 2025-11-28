@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Profile, DiagnosisRecord } from "@/types/database";
 import { 
   Search, 
   Users, 
@@ -26,7 +25,12 @@ import {
   Clock
 } from "lucide-react";
 
-interface PatientWithStats extends Profile {
+interface PatientWithStats {
+  id: string;
+  user_id: string;
+  name: string;
+  avatar_url?: string;
+  created_at: string;
   totalDiagnoses: number;
   pendingDiagnoses: number;
   lastVisit: string;
@@ -46,26 +50,46 @@ const PatientManagement = () => {
   const loadPatients = async () => {
     setIsLoading(true);
     try {
-      // 获取所有患者档案
+      // 获取所有患者角色的用户ID
+      const { data: patientRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'patient');
+
+      if (rolesError) throw rolesError;
+
+      const patientUserIds = (patientRoles || []).map(r => r.user_id);
+
+      if (patientUserIds.length === 0) {
+        setPatients([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // 获取患者档案
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('role', 'patient');
+        .in('user_id', patientUserIds);
 
       if (profilesError) throw profilesError;
 
       // 获取每个患者的诊断统计信息
-      const patientsWithStats = await Promise.all(
+      const patientsWithStats: PatientWithStats[] = await Promise.all(
         (profiles || []).map(async (profile) => {
           const { data: diagnoses, error: diagnosesError } = await supabase
             .from('diagnosis_records')
             .select('*')
-            .eq('patient_id', profile.id);
+            .eq('patient_id', profile.user_id);
 
           if (diagnosesError) {
             console.error('获取患者诊断记录失败:', diagnosesError);
             return {
-              ...profile,
+              id: profile.id,
+              user_id: profile.user_id,
+              name: profile.name,
+              avatar_url: profile.avatar_url || undefined,
+              created_at: profile.created_at,
               totalDiagnoses: 0,
               pendingDiagnoses: 0,
               lastVisit: profile.created_at,
@@ -85,7 +109,11 @@ const PatientManagement = () => {
           const riskLevel: 'high' | 'medium' | 'low' = hasHighRisk ? 'high' : hasMediumRisk ? 'medium' : 'low';
 
           return {
-            ...profile,
+            id: profile.id,
+            user_id: profile.user_id,
+            name: profile.name,
+            avatar_url: profile.avatar_url || undefined,
+            created_at: profile.created_at,
             totalDiagnoses,
             pendingDiagnoses,
             lastVisit: new Date(lastVisit).toISOString(),
