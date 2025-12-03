@@ -2,3 +2,6 @@ project_id = "hwvylvqwtmdwoduafcye"
 
 [functions.health-chat]
 verify_jwt = false
+
+[functions.skin-diagnosis]
+verify_jwt = false

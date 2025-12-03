@@ -48,98 +48,93 @@ const DiagnosisUpload = () => {
     setIsAnalyzing(true);
     setProgress(0);
 
-    // 模拟智能分析过程
-    const steps = [
-      { progress: 20, message: "图像预处理中..." },
-      { progress: 40, message: "特征提取中..." },
-      { progress: 60, message: "智能模型分析中..." },
-      { progress: 80, message: "结果生成中..." },
-      { progress: 100, message: "分析完成" }
-    ];
-
-    for (const step of steps) {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setProgress(step.progress);
-    }
-
-    // 根据症状描述判断智能分析结果
-    const hasDetailedSymptoms = symptoms && symptoms.length > 20;
-    
-    const mockResult = hasDetailedSymptoms ? {
-      diagnosis: "疑似黑色素瘤",
-      confidence: 89.3,
-      riskLevel: "高风险",
-      riskColor: "red",
-      details: [
-        "病变形态不规则，边界模糊",
-        "色素分布不均匀，存在多种颜色",
-        "病变直径较大，超过6mm",
-        "表面粗糙，存在不对称性",
-        "结合症状描述，具有恶性特征"
-      ],
-      recommendations: [
-        "立即咨询专业医生进行进一步检查",
-        "建议进行皮肤镜检查或活检",
-        "避免延误治疗时机",
-        "密切观察病变变化"
-      ],
-      needsDoctorReview: true
-    } : {
-      diagnosis: "良性色素痣",
-      confidence: 92.5,
-      riskLevel: "低风险",
-      riskColor: "green",
-      details: [
-        "图像质量良好，病变边界清晰",
-        "色素分布均匀，无明显不对称",
-        "病变直径约3mm，在正常范围内",
-        "表面平滑，无溃疡或出血征象"
-      ],
-      recommendations: [
-        "建议定期观察，如有变化及时就医",
-        "避免长时间阳光暴晒",
-        "保持皮肤清洁和滋润",
-        "建议6个月后复查"
-      ],
-      needsDoctorReview: true
-    };
-
-    setAnalysisResult(mockResult);
-    setIsAnalyzing(false);
-
-    // 保存诊断记录到数据库
     try {
+      // 进度动画
+      const progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 500);
+
+      // 将图片转换为 base64
+      const reader = new FileReader();
+      const imageBase64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(selectedFile);
+      });
+
+      // 调用 Gemini API 进行智能分析
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/skin-diagnosis`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            imageBase64,
+            symptoms
+          }),
+        }
+      );
+
+      clearInterval(progressInterval);
+      setProgress(100);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '分析失败');
+      }
+
+      const analysisData = await response.json();
+      
+      const result = {
+        diagnosis: analysisData.diagnosis,
+        confidence: analysisData.confidence,
+        riskLevel: analysisData.riskLevel,
+        riskColor: analysisData.riskLevel === '高风险' ? 'red' : 
+                   analysisData.riskLevel === '中风险' ? 'yellow' : 'green',
+        details: analysisData.details,
+        recommendations: analysisData.recommendations,
+        needsDoctorReview: true
+      };
+
+      setAnalysisResult(result);
+
+      // 保存诊断记录到数据库
       const { data, error } = await diagnosisService.createDiagnosis([selectedFile], symptoms);
       
-      if (error) throw error;
-      
-      // 更新记录的智能诊断结果
-      if (data) {
-        const { error: updateError } = await supabase
+      if (!error && data) {
+        await supabase
           .from('diagnosis_records')
           .update({
-            ai_diagnosis: mockResult.diagnosis,
-            ai_confidence: mockResult.confidence,
-            risk_level: mockResult.riskLevel
+            ai_diagnosis: result.diagnosis,
+            ai_confidence: result.confidence,
+            risk_level: result.riskLevel
           })
           .eq('id', data.id);
-        
-        if (updateError) {
-          console.error('更新智能诊断结果失败:', updateError);
-        }
       }
 
       toast({
         title: "智能分析完成",
         description: "分析结果已生成并保存，建议医生进一步确认",
       });
+
     } catch (error) {
-      console.error("保存诊断记录失败:", error);
+      console.error("智能分析失败:", error);
       toast({
-        title: "智能分析完成",
-        description: "分析结果已生成，但保存失败。建议医生进一步确认",
+        title: "分析失败",
+        description: error instanceof Error ? error.message : "请稍后重试",
         variant: "destructive"
       });
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
