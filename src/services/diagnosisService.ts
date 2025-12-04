@@ -55,15 +55,38 @@ export const diagnosisService = {
     return { data: (data as DiagnosisRecord[]) || [], error };
   },
 
-  // 医生获取待审核的诊断
+  // 医生获取待审核的诊断（包含患者信息）
   async getPendingDiagnoses(): Promise<{ data: any[], error: any }> {
-    const { data, error } = await supabase
+    // 先获取诊断记录
+    const { data: records, error: recordsError } = await supabase
       .from('diagnosis_records')
       .select('*')
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
-    return { data: data || [], error };
+    if (recordsError || !records) {
+      return { data: [], error: recordsError };
+    }
+
+    // 获取所有相关患者的信息
+    const patientIds = [...new Set(records.map(r => r.patient_id))];
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('user_id, name, avatar_url')
+      .in('user_id', patientIds);
+
+    if (profilesError) {
+      console.error('获取患者信息失败:', profilesError);
+    }
+
+    // 合并数据
+    const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+    const dataWithProfiles = records.map(record => ({
+      ...record,
+      profiles: profileMap.get(record.patient_id) || { name: '未知患者' }
+    }));
+
+    return { data: dataWithProfiles, error: null };
   },
 
   // 医生更新诊断结果
