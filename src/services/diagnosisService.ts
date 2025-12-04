@@ -6,28 +6,41 @@ export const diagnosisService = {
   // 创建新的诊断记录
   async createDiagnosis(imageFiles: File[], symptoms?: string): Promise<{ data: DiagnosisRecord | null, error: any }> {
     try {
-      // 1. 上传图片到存储桶
+      // 1. 获取当前用户
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) {
+        console.error('创建诊断失败: 用户未登录');
+        throw new Error('未登录');
+      }
+
+      console.log('开始创建诊断，用户ID:', user.user.id);
+
+      // 2. 上传图片到存储桶
       const imageUrls: string[] = [];
       
       for (const file of imageFiles) {
-        const fileName = `${Date.now()}_${file.name}`;
+        const fileName = `${user.user.id}/${Date.now()}_${file.name}`;
+        console.log('上传图片:', fileName);
+        
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('diagnosis-images')
           .upload(fileName, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('图片上传失败:', uploadError);
+          throw uploadError;
+        }
 
         const { data: { publicUrl } } = supabase.storage
           .from('diagnosis-images')
           .getPublicUrl(fileName);
         
+        console.log('图片URL:', publicUrl);
         imageUrls.push(publicUrl);
       }
 
-      // 2. 创建诊断记录
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error('未登录');
-
+      // 3. 创建诊断记录
+      console.log('创建诊断记录...');
       const { data, error } = await supabase
         .from('diagnosis_records')
         .insert({
@@ -39,8 +52,15 @@ export const diagnosisService = {
         .select()
         .single();
 
-      return { data: data as DiagnosisRecord, error };
+      if (error) {
+        console.error('保存诊断记录失败:', error);
+        throw error;
+      }
+
+      console.log('诊断记录已保存:', data);
+      return { data: data as DiagnosisRecord, error: null };
     } catch (error) {
+      console.error('创建诊断失败:', error);
       return { data: null, error };
     }
   },
