@@ -1,10 +1,10 @@
 
 
-# 皮肤健康AI平台
+# 皮肤健康诊断平台
 
 欢迎来到皮肤健康AI平台！ 这是一个创新的Web应用程序，旨在利用人工智能为您提供快速、准确的皮肤病变初步筛查。所有AI分析结果均由专业皮肤科医生进行二次审核，确保诊断的可靠性。
 
-## 🚀 项目概览
+## 项目概览
 
 该平台为**患者**和**医生**提供了一个协作环境：
 
@@ -13,7 +13,7 @@
 
 此外，平台还集成了一个**AI健康助手**，为用户提供个性化的健康咨询和生活建议。
 
-## ✨ 主要功能
+##  主要功能
 
   * **AI智能分析**: 采用先进的深度学习算法，能够识别多种皮肤病变类型，并提供置信度评估。
   * **专业医生审核**: 所有AI诊断结果都将由专业皮肤科医生进行二次审核，确保诊断的准确性和可靠性。
@@ -22,7 +22,7 @@
   * **患者管理 (医生端)**: 医生可以方便地管理和查看所有患者的信息和诊断历史。
   * **隐私保护**: 严格遵循医疗数据保护标准，确保您的个人信息和医疗数据安全。
 
-## 🛠️ 技术栈
+## 技术栈
 
   * **前端**:
       * **框架**: React
@@ -38,7 +38,7 @@
       * **Linting**: ESLint
       * **代码格式化**: Prettier (通过ESLint集成)
 
-## 🏁 开始使用
+## 开始使用
 
 ### 环境要求
 
@@ -65,7 +65,7 @@
     ```
     应用将在 `http://localhost:8080` (或您配置的其他端口) 上运行。
 
-## 📁 项目结构
+##  项目结构
 
 ```
 derma-view-ai-portal/
@@ -92,7 +92,7 @@ derma-view-ai-portal/
 └── package.json             # 项目依赖和脚本
 ```
 
-## ⚙️ Supabase集成
+##  Supabase集成
 
 本项目深度集成了Supabase，用于处理：
 
@@ -105,13 +105,13 @@ derma-view-ai-portal/
 
 所有的数据库迁移文件都位于`supabase/migrations`目录下。
 
-## 🎨 UI组件和样式
+##  UI组件和样式
 
   * **组件库**: 本项目使用了[shadcn-ui](https://ui.shadcn.com/)，它提供了一系列基于Radix UI和Tailwind CSS构建的可重用、可访问的UI组件。所有UI组件都位于`src/components/ui`目录下。
   * **样式**: 使用[Tailwind CSS](https://tailwindcss.com/)进行样式设计。配置文件为`tailwind.config.ts`，全局样式定义在`src/index.css`中。
   * **图标**: 使用[Lucide React](https://www.google.com/search?q=https://lucide.dev/guide/react)提供清晰、一致的图标。
 
-## 📜 代码规范和Linting
+##  代码规范和Linting
 
 项目使用ESLint和TypeScript-ESLint来确保代码质量和一致性。配置文件为`eslint.config.js`。
 
@@ -140,3 +140,4 @@ derma-view-ai-portal/
 之后，您可以将`dist/`目录部署到任何静态网站托管服务，如Vercel、Netlify或GitHub Pages。
 
 -----
+@ author tjh
